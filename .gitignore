@@ -1,0 +1,6 @@
+*.o
+*.exe
+ref.txt
+pipe.txt
+stall.txt
+fwd.txt
