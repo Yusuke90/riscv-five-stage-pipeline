@@ -180,38 +180,6 @@ and starts execution at the `main:` label if one exists, otherwise address
   segfaulting; the executor turns that into `CPU_MEM_FAULT`.
 - Assembler errors (`AsmError`) always carry a source line number — keep
   this up whenever you add new directives or pseudo-instructions.
-
-## A note on `valgrind`
-
-If your course requires memcheck-clean submissions from students (recommended
-starting with the pipelining lab, where manual memory management gets more
-involved), a target is provided:
-
-```bash
-make memcheck PROG=tests/sample1_sum_loop.s
-```
-
-This requires `valgrind` to be installed locally (not available in every
-sandboxed environment, including the one this code was authored in — it
-wasn't possible to verify this target here, so please run it once locally
-before relying on it for grading).
-
-## Extending the ISA registry (what a lab actually looks like)
-
-Adding an instruction is: write an `execute` function with the signature
-`void fn(CPUState *cpu, Memory *mem, DecodedInstr *instr)`, then register it:
-
-```c
-static void exec_mul(CPUState *c, Memory *m, DecodedInstr *i) { (void)m;
-    int32_t a = (int32_t)cpu_read_reg(c, i->rs1);
-    int32_t b = (int32_t)cpu_read_reg(c, i->rs2);
-    cpu_write_reg(c, i->rd, (uint32_t)(a * b));
-}
-
-void register_rv32m(void) {
-    /* opcode 0x33, funct3 0x0, funct7 0x01 is MUL's real RV32M encoding */
-    register_instruction((InstructionHandler){"mul", 0x33, 0x0, 0x01, FMT_R, exec_mul});
-}
 ```
 
 Then in `main.c`, alongside `register_rv32i_base();`, add `register_rv32m();`.
