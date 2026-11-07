@@ -5,10 +5,6 @@ portable C11, designed as the starting point for a semester of computer
 architecture labs (pipelining, hazard detection, branch prediction, the M/F
 extensions, and a custom-extension capstone).
 
-Nothing in this handout needs to be modified by students. Every lab extends
-the system by **adding new files** that plug into the interfaces described
-below.
-
 ## Why it's built this way
 
 The whole codebase hinges on one idea: instructions are not hardcoded into
@@ -58,7 +54,7 @@ riscv_sim_base/
 
 ### Where later labs' files go
 
-The base system doesn't include a pipeline yet (Lab 1 builds it), so there's
+The base system doesn't include a pipeline yet, so there's
 no `pipeline/` directory in this handout. When it's introduced, the expected
 shape is:
 
