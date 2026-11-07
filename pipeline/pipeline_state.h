@@ -1,3 +1,6 @@
+#ifndef PIPELINE_STATE_H
+#define PIPELINE_STATE_H
+
 #include <stdint.h>
 #include "isa_registry.h"
 #include "control.h"
@@ -59,8 +62,11 @@ typedef struct{
     MEMWB mem_wb;
     uint64_t cycles, retired, stalls, flushes;
     int forwarding;
+    uint64_t load_use_stalls,fwd_ex,fwd_mem;
 } Pipeline;
 
-void pipeline_init(Pipeline *p);
+void pipeline_init(Pipeline *p,int forwarding);
 CPUStatus pipeline_cycle(Pipeline *p,CPUState *cpu,Memory *mem);
 void pipeline_run(Pipeline *p,CPUState *cpu,Memory *mem,uint64_t max_cycles);
+void pipeline_summary(const Pipeline *p);
+#endif
