@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
     const char *program_path = argv[1];
     int batch_mode = 0;
     int pipeline_mode=0;
+    int pipeline_forwarding=0;
     uint64_t max_cycles = DEFAULT_MAX_CYCLES;
     uint32_t mem_size = DEFAULT_MEM_SIZE;
 
@@ -43,6 +44,8 @@ int main(int argc, char **argv) {
             mem_size = (uint32_t)strtoul(argv[++i], NULL, 0);
         }else if (strcmp(argv[i], "--pipeline") == 0) {
             pipeline_mode = 1;
+        }else if(strcmp(argv[1],"--pipeline-forward")==0 && i+1<argc){
+            pipeline_forwarding=1;
         }    
          else {
             fprintf(stderr, "unrecognized option '%s'\n", argv[i]);
@@ -83,6 +86,7 @@ int main(int argc, char **argv) {
     if (pipeline_mode) {
     Pipeline p;
     pipeline_init(&p);
+    p.forwarding=0;
     pipeline_run(&p, &cpu, &mem, max_cycles);
 
     cpu.cycle_count = p.cycles;   /* so print_status shows the pipeline's cycle count */
@@ -99,6 +103,24 @@ int main(int argc, char **argv) {
            p.retired ? (double)p.cycles / (double)p.retired : 0.0);
     } else if (batch_mode) {
         run_batch(&cpu, &mem, max_cycles);
+    }else if(pipeline_forwarding){
+        Pipeline p;
+        pipeline_init(&p);
+        p.forwarding=1;
+        pipeline_run(&p, &cpu, &mem, max_cycles);
+
+        cpu.cycle_count = p.cycles;   /* so print_status shows the pipeline's cycle count */
+
+        printf("\n");
+        print_registers(&cpu);
+        print_status(&cpu);
+        if (cpu.status == CPU_RUNNING)
+            printf("  -> stopped: reached max cycle limit (%llu)\n", (unsigned long long)max_cycles);
+
+        printf("pipeline: cycles = %llu  retired = %llu  stalls = %llu  flushes = %llu  CPI = %.3f\n",
+            (unsigned long long)p.cycles, (unsigned long long)p.retired,
+            (unsigned long long)p.stalls, (unsigned long long)p.flushes,
+            p.retired ? (double)p.cycles / (double)p.retired : 0.0);
     } else {
         run_repl(&cpu, &mem);
     }
