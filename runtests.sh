@@ -49,3 +49,4 @@ g t4_calls        278,278,280,278 2,2,3,2 219
 
 echo "$runs runs, $bad problems"
 [ $bad -eq 0 ]
+ 
